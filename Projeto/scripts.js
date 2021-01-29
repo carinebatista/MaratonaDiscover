@@ -39,11 +39,17 @@ const transactions =[
 ]
 
 const Transaction = {
+	all: transactions, 
+
+	add(transaction){
+		Transaction.all.push(transaction)
+		App.reload()
+	},
+
 	incomes(){
 		let income =0;
 		// pegar todas as transações
-		// para cada transação, 
-		transactions.forEach(transaction => {
+		Transaction.all.forEach(transaction => {
 			//se ela for maior que zero
 			if(transaction.amount > 0){
 				// Somar a uma variavel e retornar a variavel
@@ -52,15 +58,17 @@ const Transaction = {
 		})
 		return income;
 	},
+
 	expenses(){
 		let expense =0;
-		transactions.forEach(transaction => {
+		Transaction.all.forEach(transaction => {
 			if(transaction.amount < 0){
 				expense += transaction.amount;
 			}
 		})
 		return expense;
 	},
+
 	total(){
 		return Transaction.incomes() + Transaction.expenses();
 	}
@@ -76,6 +84,7 @@ const DOM = {
 		DOM.transactionsContainer.appendChild(tr)
 
 	},
+
 	innerHTMLTransaction(transaction) {
 		const CSSclass = transaction.amount > 0 ? "income" : 
 		"expense"
@@ -104,7 +113,12 @@ const DOM = {
 		document
 			.getElementById('totalDisplay')
 			.innerHTML=Utils.formatCurrency(Transaction.total())
+	},
+
+	clearTransactions() {
+		DOM.transactionsContainer.innerHTML = ""
 	}
+
 
 }
 
@@ -125,9 +139,27 @@ const Utils = {
 	}
 }
 
+const App ={
+	init() {
 
-transactions.forEach(function(transaction){
-	DOM.addTransaction(transaction)
+		Transaction.all.forEach(transaction => {
+			DOM.addTransaction(transaction)
+		})
+		
+		DOM.updateBalance()
+		
+	},
+	reload(){
+		DOM.clearTransactions()
+		App.init()
+	},
+}
+
+App.init()
+
+Transaction.add({
+	id: 39,
+	description: 'Alo',
+	amount:200,
+	date: '23/01/2021'
 })
-
-DOM.updateBalance()
