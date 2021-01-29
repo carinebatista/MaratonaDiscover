@@ -55,7 +55,7 @@ const DOM = {
 		const tr= document.createElement('tr')
 		tr.innerHTML = DOM.innerHTMLTransaction(transaction)
 
-		
+
 	},
 	innerHTMLTransaction(transaction) {
 
