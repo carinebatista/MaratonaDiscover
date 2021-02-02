@@ -87,7 +87,7 @@ const DOM = {
 		DOM.transactionsContainer.appendChild(tr)
 	},
 
-	innerHTMLTransaction(transaction) {
+	innerHTMLTransaction(transaction, index) {
 		const CSSclass = transaction.amount > 0 ? "income" : 
 		"expense"
 
