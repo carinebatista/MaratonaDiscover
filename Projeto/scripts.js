@@ -81,10 +81,10 @@ const DOM = {
 
 	addTransaction(transaction, index){
 		const tr= document.createElement('tr')
-		tr.innerHTML = DOM.innerHTMLTransaction(transaction)
+		tr.innerHTML = DOM.innerHTMLTransaction(transaction, index)
+		tr.dataset.index = index
 
 		DOM.transactionsContainer.appendChild(tr)
-
 	},
 
 	innerHTMLTransaction(transaction) {
@@ -98,7 +98,7 @@ const DOM = {
 			<td class="${CSSclass}">${amount}</td>
 			<td class="date">${transaction.date}</td>
 			<td>
-				<img src="./assets/minus.svg" alt="Remover Transação">
+				<img onclick="Transaction.remove(${index})" src="./assets/minus.svg" alt="Remover Transação">
 			</td>
 		`
  
@@ -120,11 +120,20 @@ const DOM = {
 	clearTransactions() {
 		DOM.transactionsContainer.innerHTML = ""
 	}
-
-
 }
 
 const Utils = {
+	formatAmount(value){
+		value = Number(value) *100
+
+		return value
+	}, 
+
+	formatDate(date){
+		const splittedDate = date.split("-")
+		return `${splittedDate[2]}/${splittedDate[1]}/${splittedDate[0]}`
+	},
+
 	formatCurrency(value){
 		const signal = Number(value) <0 ? "-" : "";
 
@@ -164,29 +173,52 @@ const Form = {
 				throw new Error("Por favor, preencha todos os campos")
 			}
 	},
-	submit(event) {
 
+	formatValues() {
+		let  {description, amount, date} = Form.getValues()
+
+		amount = Utils.formatAmount(amount)
+
+		date = Utils.formatDate(date)
+
+		return{
+			description,
+			amount,
+			date
+		}
+	},
+
+	clearFields(){
+		Form.description.value = ""
+		Form.amount.value = ""
+		Form.date.value = ""
+	},
+
+	submit(event) {
 		event.preventDefault()
 
 		try{
+			// validar os campos
 			Form.validateFields()
-			// Form.formatData()
+			// Formata a transação
+			const transaction = Form.formatValues()
 			// salvar
+			Transaction.add(transaction)
 			// apagar os dados do formulario
+			Form.clearFields()
 			// fechar o modal
-			// atualizar a aplicação
-		} catch (error){
+			Modal.close()
+		} catch (error) {
 			alert(error.message)
 		}
-	
 	}
 }
 
 const App ={
 	init() {
 
-		Transaction.all.forEach(transaction => {
-			DOM.addTransaction(transaction)
+		Transaction.all.forEach(transaction, index => {
+			DOM.addTransaction(transaction, index)
 		})
 		
 		DOM.updateBalance()
